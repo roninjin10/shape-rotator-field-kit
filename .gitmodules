@@ -1,0 +1,6 @@
+[submodule "research-swarm"]
+	path = research-swarm
+	url = https://github.com/dmarzzz/research-swarm.git
+[submodule "voxterm"]
+	path = voxterm
+	url = https://github.com/dmarzzz/VoxTerm.git
