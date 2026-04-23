@@ -1,17 +1,31 @@
 #!/usr/bin/env bash
 # kit — unified entry point for the shape rotator field kit
 #
+# After `./kit install-global`, this same file is reachable as `rotate`
+# (and `shape-rotator-kit`) from anywhere on PATH.
+#
 # Subcommands:
-#   kit setup                  run the full installer (same as `bash setup.sh`)
-#   kit doctor                 check every tool is installed and reachable
-#   kit update                 bump every submodule to its upstream main
-#   kit research "..."         invoke the research-swarm agent
-#   kit vox                    launch voxterm
-#   kit help                   this help
+#   rotate setup               run the full installer (same as `bash setup.sh`)
+#   rotate doctor              check every tool is installed and reachable
+#   rotate update              bump every submodule to its upstream main
+#   rotate research "..."      invoke the research-swarm agent
+#   rotate vox                 launch voxterm
+#   rotate help                this help
 
 set -euo pipefail
 
-KIT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Resolve the real path of this script even when invoked through a
+# symlink (e.g. ~/.local/bin/rotate → /path/to/kit). Without this,
+# $KIT_ROOT ends up being the symlink's directory and all the
+# repo-relative checks break.
+_src="${BASH_SOURCE[0]}"
+while [ -L "$_src" ]; do
+  _dir="$(cd -P "$(dirname "$_src")" && pwd)"
+  _src="$(readlink "$_src")"
+  case "$_src" in /*) ;; *) _src="$_dir/$_src" ;; esac
+done
+KIT_ROOT="$(cd -P "$(dirname "$_src")" && pwd)"
+unset _src _dir
 cd "$KIT_ROOT"
 
 if [ -t 1 ]; then
@@ -102,10 +116,25 @@ case "$cmd" in
 
     # 1) Symlinks
     mkdir -p "$LOCAL_BIN"
-    ln -sfn "$KIT_ROOT/kit" "$LOCAL_BIN/srk"
+
+    # Warn if `rotate` already points somewhere else on PATH (not our own
+    # prior symlink). Shadowing an existing binary is the user's call.
+    existing="$(command -v rotate 2>/dev/null || true)"
+    if [ -n "$existing" ] && [ "$existing" != "$LOCAL_BIN/rotate" ]; then
+      warn "'rotate' already on PATH at $existing — this install will shadow it"
+    fi
+
+    ln -sfn "$KIT_ROOT/kit" "$LOCAL_BIN/rotate"
     ln -sfn "$KIT_ROOT/kit" "$LOCAL_BIN/shape-rotator-kit"
-    ok "symlinked $LOCAL_BIN/srk                → $KIT_ROOT/kit"
-    ok "symlinked $LOCAL_BIN/shape-rotator-kit  → $KIT_ROOT/kit"
+    ok "symlinked $LOCAL_BIN/rotate              → $KIT_ROOT/kit"
+    ok "symlinked $LOCAL_BIN/shape-rotator-kit   → $KIT_ROOT/kit"
+
+    # If a prior install left an `srk` symlink (the old short name), remove
+    # it so uninstalls stay consistent.
+    if [ -L "$LOCAL_BIN/srk" ]; then
+      rm -f "$LOCAL_BIN/srk"
+      ok "removed legacy symlink $LOCAL_BIN/srk"
+    fi
 
     if ! printf '%s' ":$PATH:" | grep -q ":$LOCAL_BIN:"; then
       warn "$LOCAL_BIN is not on your PATH in this shell."
@@ -159,10 +188,12 @@ For tool usage, commands, and conventions, read:
   $KIT_ROOT/AGENTS.md
 
 Quick commands from anywhere on this machine:
-  srk research \"question\"     DSPy ReAct research agent
-  srk vox                      voxterm voice transcription TUI
-  srk doctor                   health check
-  srk help                     full command list
+  rotate research \"question\"  DSPy ReAct research agent
+  rotate vox                   voxterm voice transcription TUI
+  rotate doctor                health check
+  rotate help                  full command list
+
+\`shape-rotator-kit\` is the same binary if you prefer the explicit name.
 $END_MARK
 "
       touch "$CC_MD"
@@ -181,8 +212,8 @@ PY
 
     echo
     printf "${BOLD}done${RESET}\n"
-    echo "  · open a new shell (or 'exec \$SHELL') and try:  srk help"
-    echo "  · to undo this:                                 srk uninstall-global"
+    echo "  · open a new shell (or 'exec \$SHELL') and try:  rotate help"
+    echo "  · to undo this:                                 rotate uninstall-global"
     ;;
 
   uninstall-global)
@@ -192,7 +223,9 @@ PY
 
     printf "${BOLD}removing global install${RESET}\n\n"
 
-    for link in "$LOCAL_BIN/srk" "$LOCAL_BIN/shape-rotator-kit"; do
+    # Remove all known symlinks, including the legacy 'srk' name so users
+    # who installed under the old name also get a clean uninstall.
+    for link in "$LOCAL_BIN/rotate" "$LOCAL_BIN/shape-rotator-kit" "$LOCAL_BIN/srk"; do
       if [ -L "$link" ]; then
         rm -f "$link"
         ok "removed symlink $link"
@@ -221,9 +254,11 @@ PY
     cat <<EOF
 ${BOLD}kit${RESET} — shape-rotator-field-kit dispatcher
 
+Also invokable as: ${BOLD}rotate${RESET} or ${BOLD}shape-rotator-kit${RESET} after \`kit install-global\`.
+
 ${BOLD}install & maintain${RESET}
   kit setup                 bootstrap every tool (idempotent)
-  kit install-global        add \`srk\` / \`shape-rotator-kit\` to PATH,
+  kit install-global        add \`rotate\` / \`shape-rotator-kit\` to PATH,
                             export SHAPE_ROTATOR_KIT_PATH in your shell rc,
                             point ~/.claude/CLAUDE.md at AGENTS.md (if present)
   kit uninstall-global      reverse install-global cleanly
@@ -235,7 +270,7 @@ ${BOLD}invoke tools${RESET}
   kit vox                   launch voxterm
 
 ${DIM}All subcommands pass extra args through.
-Example:  kit research --parallel "survey modern mixnets"${RESET}
+Example:  rotate research --parallel "survey modern mixnets"${RESET}
 EOF
     ;;
 

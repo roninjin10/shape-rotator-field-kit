@@ -141,15 +141,15 @@ heading "done · try these"
 
 cat <<EOF
 
-  ${BOLD}voxterm${RESET}                      # local voice transcription TUI (macOS Apple Silicon)
-  ${BOLD}./bin/research-agent "..."${RESET}   # DSPy ReAct research agent
-  ${BOLD}./kit update${RESET}                 # bump submodules to their upstream main
-  ${BOLD}./kit doctor${RESET}                 # re-check everything is installed
+  ${BOLD}./kit research "..."${RESET}        # DSPy ReAct research agent
+  ${BOLD}./kit vox${RESET}                   # voxterm voice transcription TUI
+  ${BOLD}./kit doctor${RESET}                # re-check everything is installed
+  ${BOLD}./kit install-global${RESET}        # make 'rotate' callable from anywhere (optional)
 
-To run 'research-agent' from anywhere, add bin/ to your PATH:
+To call from any directory as \`rotate\` (and let roaming agents find
+this kit via \$SHAPE_ROTATOR_KIT_PATH), run:
 
-  echo 'export PATH="$KIT_ROOT/bin:\$PATH"' >> ~/.zshrc
-  exec zsh
+  ./kit install-global
 
 To switch LMs for research-swarm, edit ${DIM}research-swarm/.env${RESET}.
 EOF
