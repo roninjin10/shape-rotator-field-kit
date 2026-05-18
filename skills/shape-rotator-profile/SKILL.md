@@ -1,12 +1,12 @@
 ---
 name: shape-rotator-profile
-description: Add or update your profile in the Shape Rotator OS cohort. Walks the user through profile fields, finds their existing record if any, and opens a PR against dmarzzz/shape-rotator-field-guide. Use when the user says they want to "add my profile to shape rotator", "set up my cohort entry", "update my srfg profile", or anything similar.
+description: Add or update your profile in the Shape Rotator OS cohort. Walks the user through profile fields, finds their existing record if any, and opens a PR against dmarzzz/shape-rotator-os. Use when the user says they want to "add my profile to shape rotator", "set up my cohort entry", "update my srfg profile", or anything similar.
 ---
 
 # shape-rotator-profile
 
 Add or update a person record in the Shape Rotator OS cohort
-(`cohort-data/people/<slug>.md` in `dmarzzz/shape-rotator-field-guide`)
+(`cohort-data/people/<slug>.md` in `dmarzzz/shape-rotator-os`)
 and open a PR.
 
 ## When to invoke
@@ -36,12 +36,12 @@ Just: "what name should I look for in the cohort?" Free-text.
 
 Fetch the people directory:
 ```bash
-gh api /repos/dmarzzz/shape-rotator-field-guide/contents/cohort-data/people --jq '.[] | {name: .name, sha: .sha, path: .path}'
+gh api /repos/dmarzzz/shape-rotator-os/contents/cohort-data/people --jq '.[] | {name: .name, sha: .sha, path: .path}'
 ```
 
 For each `<slug>.md`, fetch the raw content via:
 ```bash
-gh api -H "Accept: application/vnd.github.raw" /repos/dmarzzz/shape-rotator-field-guide/contents/cohort-data/people/<slug>.md
+gh api -H "Accept: application/vnd.github.raw" /repos/dmarzzz/shape-rotator-os/contents/cohort-data/people/<slug>.md
 ```
 
 Match candidates where any of:
@@ -70,7 +70,7 @@ Show the user the schema once at the start so they know what's coming:
 - **name** — display name (e.g. "Ada Lovelace"). For EDITs, default to existing.
 - **team** — controlled vocab. Fetch the list:
   ```bash
-  gh api /repos/dmarzzz/shape-rotator-field-guide/contents/cohort-data/teams --jq '.[].name' | sed 's/\.md$//'
+  gh api /repos/dmarzzz/shape-rotator-os/contents/cohort-data/teams --jq '.[].name' | sed 's/\.md$//'
   ```
   Show numbered, let user pick or type a new slug. If new, warn that
   it'll need a matching team record (which this skill does NOT create).
@@ -152,12 +152,12 @@ values become `null` (don't write `""`).
 # Ensure fork exists. The unauthenticated check is cheap; if it 404s,
 # create the fork. --remote=false / --clone=false because we don't need
 # a local clone — we're going through the API.
-if ! gh api /repos/$GH_LOGIN/shape-rotator-field-guide >/dev/null 2>&1; then
-  gh repo fork dmarzzz/shape-rotator-field-guide --remote=false --clone=false
+if ! gh api /repos/$GH_LOGIN/shape-rotator-os >/dev/null 2>&1; then
+  gh repo fork dmarzzz/shape-rotator-os --remote=false --clone=false
   # forks take ~3 seconds to materialize; poll briefly.
   for i in 1 2 3 4 5; do
     sleep 2
-    gh api /repos/$GH_LOGIN/shape-rotator-field-guide >/dev/null 2>&1 && break
+    gh api /repos/$GH_LOGIN/shape-rotator-os >/dev/null 2>&1 && break
   done
 fi
 
@@ -165,14 +165,14 @@ fi
 BRANCH="profile/$SLUG-$(date +%Y%m%d-%H%M%S)"
 
 # Get the head sha of the fork's main so we can create a branch.
-MAIN_SHA=$(gh api /repos/$GH_LOGIN/shape-rotator-field-guide/git/refs/heads/main --jq .object.sha)
-gh api -X POST /repos/$GH_LOGIN/shape-rotator-field-guide/git/refs \
+MAIN_SHA=$(gh api /repos/$GH_LOGIN/shape-rotator-os/git/refs/heads/main --jq .object.sha)
+gh api -X POST /repos/$GH_LOGIN/shape-rotator-os/git/refs \
   -f ref="refs/heads/$BRANCH" -f sha="$MAIN_SHA"
 
 # Put the file. For EDITs, pass the existing file's sha; for ADDs, omit.
 # Content is base64-encoded.
 B64=$(echo -n "$MARKDOWN" | base64)
-ARGS=(-X PUT "/repos/$GH_LOGIN/shape-rotator-field-guide/contents/cohort-data/people/$SLUG.md"
+ARGS=(-X PUT "/repos/$GH_LOGIN/shape-rotator-os/contents/cohort-data/people/$SLUG.md"
   -f message="profile: $MODE $SLUG"
   -f content="$B64"
   -f branch="$BRANCH")
@@ -180,7 +180,7 @@ ARGS=(-X PUT "/repos/$GH_LOGIN/shape-rotator-field-guide/contents/cohort-data/pe
 gh api "${ARGS[@]}"
 
 # Open the PR.
-gh pr create --repo dmarzzz/shape-rotator-field-guide \
+gh pr create --repo dmarzzz/shape-rotator-os \
   --head "$GH_LOGIN:$BRANCH" --base main \
   --title "profile: $MODE $SLUG" \
   --body "Submitted via the shape-rotator-profile skill.

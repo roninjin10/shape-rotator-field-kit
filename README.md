@@ -16,7 +16,7 @@ rotate research "what is Loopix?"   # DSPy ReAct research agent
 rotate vox                          # voxterm voice transcription TUI
 rotate content --trace run.json     # blog + tweet thread + explainer video
 rotate install-skills               # symlink skills/* → ~/.claude/skills/
-rotate install-app                  # install the field-guide Electron app
+rotate install-app                  # install Shape Rotator OS Electron app
 rotate doctor                       # health check
 rotate update                       # bump submodules to upstream main
 rotate help                         # full command list
@@ -42,13 +42,13 @@ with:
 rotate install-app
 ```
 
-That pulls the latest [release](https://github.com/dmarzzz/shape-rotator-field-guide/releases/latest)
+That pulls the latest [release](https://github.com/dmarzzz/shape-rotator-os/releases/latest)
 for your platform, copies it into `/Applications` (macOS) or installs
 via `dpkg` (Linux), and clears the macOS quarantine flag so Gatekeeper
 doesn't refuse to open the unsigned bundle.
 
 **Manual install (any platform):** download the appropriate file from
-[releases/latest](https://github.com/dmarzzz/shape-rotator-field-guide/releases/latest):
+[releases/latest](https://github.com/dmarzzz/shape-rotator-os/releases/latest):
 - macOS arm64: `ShapeRotatorOS-<version>-mac-arm64.dmg`
 - macOS x64: `ShapeRotatorOS-<version>-mac-x64.dmg`
 - Windows: `ShapeRotatorOS-<version>-win-x64.exe`

@@ -66,7 +66,7 @@ git submodule update --init --recursive
 - **What it is:** a directory of `<name>/SKILL.md` files Claude Code can
   invoke as `/<name>`. Currently shipped:
   - `shape-rotator-profile` — interactive add/update of the user's
-    cohort person record in `dmarzzz/shape-rotator-field-guide`, ending
+    cohort person record in `dmarzzz/shape-rotator-os`, ending
     in a PR. Walks them through the schema, finds their existing entry
     if any, preserves fields the user doesn't touch.
   - `matrix-bot-setup` — register the user's local agent on the cohort
@@ -80,10 +80,10 @@ git submodule update --init --recursive
   outside the `matrix-bot-setup` skill yet — wait for the operator to
   supply homeserver details.
 
-### `field-guide` Electron app
+### `Shape Rotator OS` Electron app
 
 - **What it is:** the cohort participant viewer / profile editor —
-  separate repo (`dmarzzz/shape-rotator-field-guide`), shipped as
+  separate repo (`dmarzzz/shape-rotator-os`), shipped as
   signed-by-no-one DMG / deb / exe.
 - **Install:** `rotate install-app` downloads the latest release for
   the current platform, copies it into `/Applications` (mac) or
@@ -91,7 +91,7 @@ git submodule update --init --recursive
   so Gatekeeper doesn't refuse to open the unsigned bundle.
 - **Manual path:** if `rotate install-app` doesn't fit (Windows, custom
   prefix, etc.), grab the dmg/exe/deb from
-  <https://github.com/dmarzzz/shape-rotator-field-guide/releases/latest>.
+  <https://github.com/dmarzzz/shape-rotator-os/releases/latest>.
   On macOS only: after copying to /Applications, run
   `xattr -cr "/Applications/Shape Rotator OS.app"` to clear the
   quarantine bit. Without it, Gatekeeper will refuse to open the app

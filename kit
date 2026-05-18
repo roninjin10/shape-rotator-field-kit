@@ -151,14 +151,14 @@ case "$cmd" in
     ok "installed $n skill(s). Invoke as /<name> from Claude Code."
     ;;
 
-  install-app|field-guide|app)
-    # Download + install the field-guide Electron app for the user's
+  install-app|Shape Rotator OS|app)
+    # Download + install Shape Rotator OS Electron app for the user's
     # platform. Pulls the latest release from GitHub, mounts the dmg /
     # extracts the deb / etc., copies into the OS app dir. On macOS we
     # also clear the quarantine attribute (the app is unsigned, so
     # Gatekeeper otherwise refuses to open it without a manual context-
     # menu Open).
-    REPO="dmarzzz/shape-rotator-field-guide"
+    REPO="dmarzzz/shape-rotator-os"
     APP_NAME="Shape Rotator OS"
     printf "${BOLD}installing $APP_NAME${RESET}\n\n"
     if ! command -v curl >/dev/null 2>&1; then
@@ -403,7 +403,7 @@ ${BOLD}install & maintain${RESET}
                             point ~/.claude/CLAUDE.md at AGENTS.md (if present)
   kit install-skills        symlink skills/* into ~/.claude/skills/ so they're
                             invokable as /<name> from Claude Code
-  kit install-app           download + install the field-guide Electron app
+  kit install-app           download + install Shape Rotator OS Electron app
                             for the current platform (handles macOS Gatekeeper)
   kit uninstall-global      reverse install-global cleanly
   kit update                bump every submodule to upstream main
